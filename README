@@ -1,0 +1,17 @@
+d3minst is a Perl script that will extract the necessary files to play
+Descent 3: Mercenary from the d3merc.pkg file on the expansion's CD.
+
+Included is the Perl module GKPOPackage which parses and extracts files
+from the PKG file.
+
+To build d3minst:
+	- Run build.pl.  This appends the necessary files to d3minst.  Note
+	  that d3minst will be overwritten every time this happens.
+	  
+To run d3minst:
+	- perl d3minst [optional path to d3merc.pkg]
+	- This will use the default path /media/D3_MERCS/d3merg.pkg unless
+	  you provide another path to use.
+	  
+James Kastrantas
+jgk16@msstate.edu
