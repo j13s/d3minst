@@ -9,6 +9,7 @@ To build d3minst:
 	  that d3minst will be overwritten every time this happens.
 	  
 To run d3minst:
+	- cd [descent3 directory]
 	- perl d3minst [optional path to d3merc.pkg]
 	- This will use the default path /media/D3_MERCS/d3merg.pkg unless
 	  you provide another path to use.
