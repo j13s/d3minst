@@ -26,7 +26,7 @@ use Getopt::Long;
 
 use GKPOPackage;
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 my $install;
 my $verbose;
@@ -42,6 +42,9 @@ unless ($install) {
     exit;
 }
 
+if ($verbose) {
+    print "Parsing PKG file...\n";
+}
 
 # Ubuntu Lucid path, otherwise use the path from the command line to the
 # Mercenary PKG file.
@@ -73,6 +76,9 @@ my @merc_files = qw(
 
 
 foreach my $f ($pkg_file->get_files(@merc_files)) {
+    # Autoflush STDOUT.
+    local $| = 1;
+
     if ($verbose) {
         print $install, "/";
 
