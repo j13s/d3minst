@@ -26,6 +26,9 @@ use Fcntl qw(SEEK_SET SEEK_CUR);
 use IO::File;
 use Carp;
 
+use GKPOPackage::File;
+
+
 # PKG_ refers to whole GKPO package constant.
 # PKGF_ refers to constants that are specific to each file's metadata.
 
@@ -61,11 +64,20 @@ sub new {
 }
 
 
+
+
 sub get_files {
-    my ($self) = @_;
+    my ($self, @files) = @_;
     
-    return @{$self->{'files'}};
+    unless (@files) {
+        return values %{$self->{'files'}};
+    }
+    
+    return map { $self->{'files'}->{$_} } (@files);
 }
+
+
+
 
 sub _init {
     my ($self) = @_;
@@ -82,7 +94,7 @@ sub _init {
     $self->{'fh'}->binmode();
     
     # Stores the GKPOPackage::File objects.
-    $self->{'files'} = [];
+    $self->{'files'} = {};
     
     # Sort of verifies this is a GKPO Package file by reading the
     # header.    
@@ -98,6 +110,9 @@ sub _init {
     $self->_read_file_records(PKG_DATA_START);
 }
 
+
+
+
 # Verifies this is a GKPO file by reading the header.
 sub _read_header {
     my ($self) = @_;
@@ -111,6 +126,8 @@ sub _read_header {
     
     return 1;
 }
+    
+    
     
 
 # Build a list of filename objects for the package
@@ -128,7 +145,7 @@ sub _read_file_records {
             'pkg'         => $self->{'pkg'},
         });
         
-        push @{$self->{'files'}}, $f;
+        $self->{'files'}->{$f->filename()} = $f;
     } while ($offset = $f->_read_next_record_offset($self->{'fh'}));
 }
 

@@ -37,6 +37,9 @@ use constant PKGF_PATH_STRING_POS    => 4;
 # Probably a checksum of some kind to check file integrity.
 use constant PKGF_UNKNOWN_METADATA_LENGTH => 8;
 
+
+
+
 my @attributes = qw(
     filename
     filesize
@@ -48,6 +51,9 @@ my @attributes = qw(
     meta_offset
     filename_length
 );
+
+
+
 
 sub new {
 	my ($class, $args_ref) = @_;
@@ -173,12 +179,16 @@ sub _read_filesize {
 
 
 
+
 # Return the metadata offset for the file record.
 sub meta_offset {
     my ($self) = @_;
     
     return $self->{'meta_offset'};
 }
+
+
+
 
 # Get the name of the file packed in the PKG file.
 sub filename {
@@ -187,6 +197,9 @@ sub filename {
     return $self->{'filename'};
 }
 
+
+
+
 # Get the size of the file packed in the PKG file.
 sub filesize {
     my ($self,) = @_;
@@ -194,11 +207,29 @@ sub filesize {
     return $self->{'filesize'};
 }
 
+
+
+
 sub file_offset {
     my ($self,) = @_;
     
     return $self->{'file_offset'}
 }
+
+
+
+
+sub path {
+    my ($self) = @_;
+    
+    my $path = $self->{'path'};
+    
+    chop $path;
+    
+    return $path;
+}
+
+
 
 # Read a null-terminated string into memory and return it.
 sub _read_string {
@@ -222,6 +253,8 @@ sub _read_string {
 }
 
 
+
+
 # Return the offset pointing to the next file record.  Returns undef if
 # there are no more records.
 sub _read_next_record_offset {
@@ -236,9 +269,12 @@ sub _read_next_record_offset {
     return $next_offset;
 }
 
+
+
+
 # Extract a file from the PKG file.
 sub write_out_file {
-    my ($self) = @_;
+    my ($self, $install_dir) = @_;
     
     # Open the parent PKG file.
     my $pkg_fh = IO::File->new($self->{'pkg'}, '<');
@@ -247,23 +283,23 @@ sub write_out_file {
         croak "Could not open $self->{'pkg'}";
     }
     
-    # A guess for a good buffer size is 32K.  I welcome suggestions.
-    my $buffer_size = 2 ** 15;
+    # A guess for a good buffer size is 4K.  I welcome suggestions.
+    my $buffer_size = 2 ** 12;
     
-    # If a path exists for this file and the path doesn't exist, create the
-    # directory.
-    if ($self->{'path'} && !(-e $self->{'path'})) {
+    # If a path exists for this file and the path to the file on the hard
+    # drive doesn't exist, create the directory on the hard drive.
+    if ($self->{'path'} && !(-e "$install_dir/$self->{'path'}")) {
         my $path = $self->{'path'};
         chop $path;
-        make_path($path);
+        make_path("$install_dir/$path");
     }
     
     # Full path to filename to write.
     my $filename = "$self->{'path'}$self->{'filename'}";
-    my $new_fh = IO::File->new($filename, '>');
+    my $new_fh = IO::File->new("$install_dir/$filename", '>');
     
     unless ($new_fh) {
-        croak "Could not create $filename";
+        croak "Could not create $install_dir/$filename";
     }
     
     # Number of bytes left to write for file.
@@ -272,7 +308,7 @@ sub write_out_file {
     # Seek to the start of the file in the PKG.
     $pkg_fh->seek($self->{'file_offset'}, SEEK_SET);
     
-    # Keep writing out 32K chunks while there are still bytes left.
+    # Keep writing out chunks while there are still bytes left.
     do {
         # If there are fewer bytes left than the buffer size, change the
         # buffer size to the number of bytes left for the last time.

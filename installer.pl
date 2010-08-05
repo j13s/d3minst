@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 
+# d3minst - A Descent 3: Mercenary installer for Linux
 # Copyright (C) 2010 James Kastrantas
 #
 # This program is free software; you can redistribute it and/or
@@ -20,8 +21,27 @@ use strict;
 use warnings;
 use diagnostics;
 
+use Text::Wrap;
+use Getopt::Long;
 
 use GKPOPackage;
+
+our $VERSION = '1.0.0';
+
+my $install;
+my $verbose;
+
+GetOptions(
+    "install=s" => \$install,
+    "verbose"   => \$verbose,
+);
+
+# Exit unless there is a specified installation directory. 
+unless ($install) {
+    print usage();
+    exit;
+}
+
 
 # Ubuntu Lucid path, otherwise use the path from the command line to the
 # Mercenary PKG file.
@@ -29,8 +49,6 @@ my $pkg_file = GKPOPackage->new({
     'pkg' => ($ARGV[0]) ? $ARGV[0] : '/media/D3_MERCS/d3merc.pkg',
 });
 
-
-my @files = $pkg_file->get_files();
 
 my @merc_files = qw(
     merc.hog
@@ -53,13 +71,39 @@ my @merc_files = qw(
     tri-pod.txt
 );
 
-my %good_files = map { $_ => 1} (@merc_files);
 
-foreach my $f (@files) {
-    next unless defined $good_files{$f->filename()};
-    print $f->filename(), "\n";
-#    print "\tSize: ", $f->size(), "\n";
-#    print "\tOffset: ", $f->file_offset(), "\n";
+foreach my $f ($pkg_file->get_files(@merc_files)) {
+    if ($verbose) {
+        print $install, "/";
 
-    $f->write_out_file();
+        if ($f->path()) {
+            print $f->path(), "/";
+        }
+    
+        print $f->filename();
+    }
+    
+    # Write file to installation directory.
+    $f->write_out_file($install);
+    
+    if ($verbose) {
+        print "\n";
+    }
+}
+
+
+sub usage {
+    print wrap ('', '',
+        "d3minst $VERSION - A Descent 3: Mercenary installer for Linux.\n",
+        "Copyright (C) 2010 James Kastrantas.  d3minst comes with ",
+        "ABSOLUTELY NO WARRANTY.  This is free software, and you are ",
+        "welcome to redistribute it under certain conditions; see COPYING ",
+        "for details.\n\n",
+        
+        "Usage: d3minst --install=[dir] [path-to-d3merc.pkg]\n\n",
+              
+        "Options:\n",
+        "--install=[dir]    Install to directory specified.\n",
+        "--verbose          Have the installer describe what it's doing.\n"
+    );
 }

@@ -1,3 +1,30 @@
+d3minst 1.0.0
+http://github.com/james-kastrantas/d3minst
+
+NOTICE
+If you have any files named:
+    merc.hog
+    movies/mi.mve
+    movies/me.mve
+    missions/bluedev.mn3
+    missions/bluedev.txt
+    missions/bside.mn3
+    missions/bsidectf.mn3
+    missions/chaos.mn3
+    missions/havoc.mn3
+    missions/kata12.mn3
+    missions/kata12.txt
+    missions/mayhem.mn3
+    missions/merc.mn3
+    missions/poe.mn3
+    missions/stonecutter.mn3
+    missions/stonecutter.txt
+    missions/tri-pod.mn3
+    missions/tri-pod.txt
+    
+...they will be overwritten without being checked for existence.  One
+should not use these filenames because they are used by Mercenary.
+
 d3minst is a Perl script that will extract the necessary files to play
 Descent 3: Mercenary from the d3merc.pkg file on the expansion's CD.
 
@@ -9,10 +36,11 @@ To build d3minst:
 	  that d3minst will be overwritten every time this happens.
 	  
 To run d3minst:
-	- cd [descent3 directory]
-	- perl d3minst [optional path to d3merc.pkg]
+	- perl d3minst --install=install-dir [optional path to d3merc.pkg]
 	- This will use the default path /media/D3_MERCS/d3merg.pkg unless
 	  you provide another path to use.
+	- An installation directory must be provided, otherwise the script
+	  will do nothing.
 	  
 James Kastrantas
 jgk16@msstate.edu
